@@ -7,22 +7,65 @@ The software is now in the process of being cleaned up. It will be available **s
 In the meantime, we will share the basic concepts here.
 
 ## Output channels and trigger pins
-The Arduino pins for the output channels are chosen so that they all belong to a single _PIO PORT_ (`PORTC`)
+The Arduino pins for the pulsebox channels are chosen so that they all belong to a single _PIO PORT_ (`PORTC`).
+This allows us to change the state of the pulsebox with just one instruction - a write into the `REG_PIOC_ODSR` register.
+`PORTC` was chosen because it contained the largest number of free general-purpose digital pins (26).
 
 ![The output channels and trigger pin layout](examples/pins.png)
 
-channel | PORTC bit | Arduino pin | channel | PORTC bit | Arduino pin | 
---------|-----------|-------------|---------|-----------|-------------|
-   1    |     1     |     33      |    9    |    12     |     51      |
-   2    |     3     |     35      |   10    |     2     |     34      |
-   3    |     5     |     37      |   11    |     4     |     36      |
-   4    |     7     |     39      |   12    |     6     |     38      |
-   5    |     9     |     41      |   13    |     8     |     40      |
-   6    |    18     |     45      |   14    |    19     |     44      |
-   7    |    16     |     47      |   15    |    17     |     46      |
-   8    |    14     |     49      |   16    |    15     |     48      |
+Following are the default pin assignments (see the picture above). The sixteen pins were chosen because of their mutual proximity.
 
-**Trigger channel:** Arduino pin 52
+channel | PORTC bit | Arduino pin |
+--------|-----------|-------------|
+   1    |     1     |     33      |
+   2    |     3     |     35      |
+   3    |     5     |     37      |
+   4    |     7     |     39      |
+   5    |     9     |     41      |
+   6    |    18     |     45      |
+   7    |    16     |     47      |
+   8    |    14     |     49      |
+   9    |    12     |     51      |
+  10    |     2     |     34      |
+  11    |     4     |     36      |
+  12    |     6     |     38      |
+  13    |     8     |     40      |
+  14    |    19     |     44      |
+  15    |    17     |     46      |
+  16    |    15     |     48      |
+
+**Trigger channel:** Arduino pin 52. The trigger pin does not have to belong to the same `PORT` as the pulsebox pins. Again, we have chosen pin 52 because of its proximity to the pulsebox pins.
+
+In principle, there are 26 `PORTC` pins available. The following table (based on a [similar table](https://www.arduino.cc/en/Hacking/PinMappingSAM3X) found in the Arduino Due documentation) lists them all:
+
+PORTC bit | Arduino pin | Mapped pin name
+----------|-------------|----------------
+1 | 33 | Digital pin
+2 | 34 | Digital pin
+3 | 35 | Digital pin
+4 | 36 | Digital pin
+5 | 37 | Digital pin
+6 | 38 | Digital pin
+7 | 39 | Digital pin
+8 | 40 | Digital pin
+9 | 41 | Digital pin
+12 | 51 | Digital pin
+13 | 50 | Digital pin
+14 | 49 | Digital pin
+15 | 48 | Digital pin
+16 | 47 | Digital pin
+17 | 46 | Digital pin
+18 | 45 | Digital pin
+19 | 44 | Digital pin
+21 | 9 | Digital pin
+22 | 8 | Digital pin
+23 | 7 | Digital pin
+24 | 6 | Digital pin
+25 | 5 | Digital pin
+26 | 4 | Digital pin
+28 | 3 | Digital pin
+29 | 10 | Digital pin
+30 | 72 | LED RX
 
 ## The primitive code blocks: output changes and artificial delays
 The _output change_ is made by writing into the `REG_PIOC_ODSR` register. For example, to set channels 1 and 2 to `HIGH`, we use the following `C` statement:
