@@ -20,5 +20,11 @@ Here we wish to share two main parts of the project:
 An arbitrary digital pulse sequence generator, or _pulsebox_, is an electronic device with a number of digital channels. It can change the states of these channels very quickly and with great timing precision, and can thus create complex sequences of multi-channel digital patterns, or pulse sequences.
 
 Arduino Due is a general-purpose development board. It is based on a 32-bit Atmel SAM3X8E microcontroller (ARM Cortex-M3 architecture) running at 84 MHz.
+This board is capable of providing 26 digital (pulsebox) channels and create digital pulse sequences on them, with pulses as short as 100 ns. This is achieved by carefully using the low-level capabilities of the SAM3X8E microcontroller in conjuction with assembly language instructions.
+
+See [Arduino pulsebox code structure](https://github.com/rhosak/pulsebox/wiki/Arduino-pulsebox-code-structure) for an overview of the code responsible for the pulsebox capabilities.
 
 ## The software
+We have created a Python package which can produce the `.ino` code necessary to produce a pulse sequence according to user specification, and a GUI application to facilitate this process to the end user.
+
+_I am currently making the code available, please be patient._ :)
