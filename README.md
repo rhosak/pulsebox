@@ -4,7 +4,7 @@ Arbitrary digital pulse sequence generator (_pulsebox_) with delay-loop timing, 
 This repository accompanies the paper by R. Hošák and M. Ježek ([arXiv preprint](https://arxiv.org/abs/1801.02433), [published in Rev. Sci. Inst. 89, 045103 (2018)](https://doi.org/10.1063/1.5019685))
 
 Here we wish to share two main parts of the project:
-1. The concepts:
+1. [The concepts](#the-concepts):
    - How to use Arduino Due as a pulse sequence generator
    - What makes up the appropriate `.ino` source file
    - How to control Arduino Due using lower-level instructions
