@@ -10,7 +10,7 @@ Here we wish to share two main parts of the project:
    - How to control Arduino Due using lower-level instructions
       + How to change the state of numerous digital pins at once
       + How to produce very precise delays ranging from tens of nanoseconds to seconds and more.
-2. The software: Python package used to
+2. [The software](#the-software): Python package used to
    - Configure the Arduino Due as a pulse sequence generator
    - Read a user specification of a multi-channel digital pulse sequence
    - Generate, compile, and upload the appropriate code to Arduino Due
@@ -20,3 +20,5 @@ Here we wish to share two main parts of the project:
 An arbitrary digital pulse sequence generator, or _pulsebox_, is an electronic device with a number of digital channels. It can change the states of these channels very quickly and with great timing precision, and can thus create complex sequences of multi-channel digital patterns, or pulse sequences.
 
 Arduino Due is a general-purpose development board. It is based on a 32-bit Atmel SAM3X8E microcontroller (ARM Cortex-M3 architecture) running at 84 MHz.
+
+## The software
