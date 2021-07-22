@@ -1,0 +1,13 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+tox = "*"
+pulsebox = {editable = true, file = "file:///home/rh/Cloud/DaksuIsland/Projects/2021_PulseboxRevival/github/pulsebox"}
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"

@@ -2,15 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import os.path
-from .context import config
+import os
+# from .context import config
+from pulsebox import config
 
 class ConfigFileTest(unittest.TestCase):
     """Tests regarding the config file
     """
     
     def test_presence(self):
-        self.assertTrue(os.path.isfile("pulsebox/config.ini"),
+        self.assertTrue(os.path.isfile("src/pulsebox/config.ini"),
                         "The config.ini file was not found.")
 
     def test_pulsebox_section(self):

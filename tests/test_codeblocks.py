@@ -3,7 +3,8 @@
 
 import unittest
 
-from .context import codeblocks, config
+# from .context import codeblocks, config
+from pulsebox import codeblocks, config
 
 
 class HeaderTest(unittest.TestCase):

@@ -41,7 +41,8 @@ parser.read_dict(DEFAULTS)  # load the default configuration
 # from the `src` directory, we need to descend into `pulsebox` first.
 # We will store the path to the configuration file, just in case we need it.
 filename = parser.read(["config.ini",
-                       os.path.join("pulsebox", "config.ini")])[0]
+                       os.path.join("pulsebox", "config.ini"),
+                       os.path.join("src", "pulsebox", "config.ini")])[0]
 
 pulsebox_pins = [*map(int, parser.get("Pulsebox", "pulsebox_pins").split(","))]
 trigger_pin = parser.getint("Pulsebox", "trigger_pin")
