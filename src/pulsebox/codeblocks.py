@@ -8,7 +8,7 @@ Radim Hošák <hosak(at)optics.upol.cz>
 2021 Quantum Optics Lab Olomouc
 """
 
-from . import config
+import config
 
 from functools import reduce
 
