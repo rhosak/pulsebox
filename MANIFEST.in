@@ -1,0 +1,9 @@
+include setup.py
+include MANIFEST.in
+include LICENSE.txt
+include README.md
+
+graft test
+graft examples
+graft docs
+graft src
