@@ -3,7 +3,7 @@
 
 import unittest
 import os
-# from .context import config
+
 from pulsebox import config
 
 class ConfigFileTest(unittest.TestCase):

@@ -36,10 +36,28 @@ def read_time(time_string):
         "m": 1e-3,
         "s": 1
     }
-    number, unit = time_string[:-1], time_string[-1]
+    
+    # Check that the time string is properly formatted, e. g. time part
+    # is followed by the unit part. The string should contain at least two
+    # character, otherwise splitting it into two parts will raise an IndexError.
+    try:
+        number, unit = time_string[:-1], time_string[-1]
+    except (IndexError, TypeError):
+        raise ValueError("Invalid time string given.")
+
+    # If the 'time part' cannot be converted to float, this raises a ValueError.
+    number = float(number)
+    
+    if number < 0:
+        raise ValueError("Negative time values are not allowed.")
+    
+    # Check that a valid time unit was specified. If no unit was specified,
+    # then what we call 'unit' will in fact be the last digit of the time value
+    # and as we do not use numeric unit symbols, we still get an error.
     try:
         factor = factors[unit]
     except KeyError:
         raise ValueError("Invalid time unit given.")
+
     time = number * factor
     return time
