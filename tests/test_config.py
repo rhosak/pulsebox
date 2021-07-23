@@ -61,11 +61,11 @@ class PulseboxPinsTest(unittest.TestCase):
                          "pulsebox_pins incorrectly parsed by config.py.")
 
     def test_correct_portC_pins(self):
-        forbidden_pins = [10, 11, 20, 27]
+        forbidden_portc_pins = [10, 11, 20, 27]
         for pin in config.pulsebox_pins:
             self.assertTrue(1 <= pin <= 30,
                             "Pulsebox pin number outside of allowed range.")
-            self.assertNotIn(pin, forbidden_pins,
+            self.assertNotIn(pin, forbidden_portc_pins,
                              "Forbidden PORTC pin found in pulsebox_pins.")
         
 

@@ -8,56 +8,50 @@ Radim Hošák <hosak(at)optics.upol.cz>
 2021 Quantum Optics Lab Olomouc
 """
 
-def read_time(time_string):
-    """Calculate time from a string containing a number and a time unit.
-    
-    The unit is denoted by the last character of `time_string`. Time is
-    calculated by multiplying the 'number part' of `time_string` by a factor
-    corresponding to the unit.
-    
-    The following units are accepted:
+from copy import deepcopy
+from operator import attrgetter
 
-        * n: nanoseconds (factor = 1e-9)
-        * u: microseconds (1e-6)
-        * m: milliseconds (1e-3)
-        * s: seconds (1)
-        * TODO: c: MCU clock cycles (12e-9)
-        * TODO: i: delay loop iterations (see `calibration` in config.ini)
-    
-    Args:
-        * time_string (str): The (number + unit) string, for example "1m"
-    
-    Returns:
-        * float time: Time (in seconds).
-    """
-    factors = {
-        "n": 1e-9,
-        "u": 1e-6,
-        "m": 1e-3,
-        "s": 1
-    }
-    
-    # Check that the time string is properly formatted, e. g. time part
-    # is followed by the unit part. The string should contain at least two
-    # character, otherwise splitting it into two parts will raise an IndexError.
-    try:
-        number, unit = time_string[:-1], time_string[-1]
-    except (IndexError, TypeError):
-        raise ValueError("Invalid time string given.")
+import pulsebox.events as pev
+from pulsebox.config import pulsebox_pincount
 
-    # If the 'time part' cannot be converted to float, this raises a ValueError.
-    number = float(number)
-    
-    if number < 0:
-        raise ValueError("Negative time values are not allowed.")
-    
-    # Check that a valid time unit was specified. If no unit was specified,
-    # then what we call 'unit' will in fact be the last digit of the time value
-    # and as we do not use numeric unit symbols, we still get an error.
-    try:
-        factor = factors[unit]
-    except KeyError:
-        raise ValueError("Invalid time unit given.")
 
-    time = number * factor
-    return time
+class FlipSequence():
+    def __init__(self, flips = []):
+        self.flips = flips
+
+    def sort_flips(self):
+        self.flips.sort(key=attrgetter("timestamp"))
+
+
+class Sequence():
+    def __init__(self, events = [], init_states = [0] * pulsebox_pincount):
+        self.events = events
+        self.channel_states = init_states
+        self.loop_counter = 0
+        self.time = 0
+
+    def from_flip_sequence(self, fs, init_states = [0] * pulsebox_pincount):
+        fs.sort_flips()
+        
+        # This technique relies on using `pop()`, which eliminates the last
+        # element of an array. So (1) we copy the array of flip events and
+        # (2) we are going to reverse it, so `pop()` effectively eliminates
+        # the first (smallest-timestamp) element.
+        flips = deepcopy(fs.flips)[::-1]
+
+        events = []  # We will store the low-level events here
+        time = 0  # keep track of 'current' time as we go through the flips
+        
+        # Go through all of the flips and create low level
+        # `DelayEvent` and `StateChangeEvent` instances as needed.
+        while flips:
+            # Check the timestamp of the flip. Do we need a delay?
+            required_delay = flip.timestamp - time
+            required_iters = pev.time2iters(required_delay)
+            if required_iters > 0:
+                events.append(pev.DelayEvent(iters=required_iters))
+            time += required_delay
+            
+            # How many channel flips are happenning at once?
+            
+        __init__(self, events, init_states)

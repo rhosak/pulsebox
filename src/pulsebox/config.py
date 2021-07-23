@@ -30,6 +30,8 @@ DEFAULTS = {
     }
 }
 
+forbidden_portc_pins = [10, 11, 20, 27]
+
 parser = configparser.ConfigParser()
 parser.read_dict(DEFAULTS)  # load the default configuration
 
