@@ -10,11 +10,13 @@ Radim Hošák <hosak(at)optics.upol.cz>
 
 from functools import reduce
 
-from pulsebox.config import calibration, pulsebox_pins, pulsebox_pincount
+from pulsebox.codeblocks import state_change, loop, channel_states_to_odsr
+from pulsebox.config import calibration, pulsebox_pincount
 
 
 class DelayEvent():
-    def __init__(self, time_string=None, iters=None, duration=None):
+    def __init__(self, time_string=None, iters=None,
+                 duration=None, loop_suffix="0"):
         if time_string:
             duration = read_time(time_string)
             iters = time2iters(duration)
@@ -22,8 +24,13 @@ class DelayEvent():
             iters = time2iters(duration)
         elif iters:
             duration = calibration * iters
+
+        codeblock = loop(iters, loop_suffix)
+
         self.duration = duration
         self.iters = iters
+        self.loop_suffix = loop_suffix
+        self.codeblock = codeblock
 
     def from_time_string(self):
         duration = read_time(time_string)
@@ -36,9 +43,12 @@ class DelayEvent():
 
 class StateChangeEvent():
     def __init__(self, channel_states):
-        self.channel_states = channel_states
         odsr = channel_states_to_odsr(channel_states)
+        codeblock = state_change(odsr_value=odsr)
+        
+        self.channel_states = channel_states
         self.odsr = odsr
+        self.codeblock = codeblock
 
     def __repr__(self):
         # msg = "Pulsebox state change: \n"
@@ -145,11 +155,3 @@ def time2iters(time):
         raise ValueError("Negative time is not allowed.")
     iters = int(round(time / calibration))
     return iters
-
-def channel_states_to_odsr(channel_states):
-    # Validity of channel to pin mapping should have been checked before
-    # using the tests. We should be okay here.
-    high_pins = [pin for state, pin in zip(channel_states, pulsebox_pins)
-                 if state == 1]
-    odsr = bin(reduce(lambda x, y: x ^ (1 << y), high_pins, 0))
-    return odsr

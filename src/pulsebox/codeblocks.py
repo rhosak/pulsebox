@@ -12,6 +12,8 @@ from . import config
 
 from functools import reduce
 
+from pulsebox.config import pulsebox_pins, pulsebox_pincount
+
 def header(msg=config.header):
     """A (usually) one-line comment written at the top of the .ino file.
     
@@ -103,7 +105,7 @@ def setup(triggered=False, parameter=None):
            "void sequence() {"
     return stp
 
-def state_change(channel_states):
+def state_change(channel_states=None, odsr_value=None):
     """Code to change pulsebox channel state by writing into `REG_PIOC_ODSR`.
     
     Args:
@@ -115,18 +117,11 @@ def state_change(channel_states):
         * str chng: A piece of code responsible for writing a binary number
             into the `REG_PIOC_ODSR` to achieve the desired state change.
     """
-    if len(channel_states) != config.pulsebox_pincount:
-        raise ValueError("Incorrect number of channel states given.")
-    
-    # See what channels are being set to high. What pins correspond to them?
-    high_pins = [pin for channel, pin in enumerate(config.pulsebox_pins)
-                 if channel_states[channel] == 1]
+    if not odsr_value and not channel_states:
+        raise ValueError("Neither channel states or ODSR value given.")
 
-    # Calculate the value of `REG_PIOC_ODSR`.
-    # Start with a binary number full of zeros.
-    # For every pin that must be set to high,
-    # flip the corresponding bit.
-    odsr_value = bin(reduce(lambda x, y: x ^ (1 << y), high_pins, 0))
+    if not odsr_value:
+        odsr_value = channel_states_to_odsr(channel_states)
     
     chng = f"   REG_PIOC_ODSR = {odsr_value};"
     return chng
@@ -192,3 +187,16 @@ def end():
            "   ;\n" \
            "}"
     return tail
+
+def channel_states_to_odsr(channel_states):
+    if len(channel_states) != pulsebox_pincount:
+            raise ValueError("Incorrect number of channel states given.")
+
+    high_pins = [pin for state, pin in zip(channel_states, pulsebox_pins)
+                 if state == 1]
+    # Calculate the value of `REG_PIOC_ODSR`.
+    # Start with a binary number full of zeros.
+    # For every pin that must be set to high,
+    # flip the corresponding bit.
+    odsr = bin(reduce(lambda x, y: x ^ (1 << y), high_pins, 0))
+    return odsr

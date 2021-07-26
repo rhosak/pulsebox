@@ -55,7 +55,8 @@ class Sequence():
             required_delay = flip.timestamp - time
             required_iters = pev.time2iters(required_delay)
             if required_iters > 0:
-                events.append(pev.DelayEvent(iters=required_iters))
+                events.append(pev.DelayEvent(iters=required_iters,
+                                             loop_suffix=str(loop_counter)))
                 loop_counter += 1
             time += required_delay  # advance time
 
@@ -76,7 +77,7 @@ class Sequence():
                 else:
                     out_of_flips = True
                     break
-            print(channel_states)
+
             # Funny thing: If you create a StateChangeEvent with given
             # channel_states and then change this variable later on, the
             # event changes as well. Using deepcopy to prevent this.
@@ -93,5 +94,8 @@ class Sequence():
 
     def __repr__(self):
         msg = f"Sequence - duration: {self.time} s, loops: {self.loop_counter}\n"
-        msg += str(self.events).strip("[]").replace(", ", "\n")
+        msg += "\t* " + str(self.events[:10]).strip("[]").replace(", ",
+                                                                  "\n\t* ")
+        if len(self.events) > 10:
+            msg += "\n\t* ..."
         return msg
