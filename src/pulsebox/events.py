@@ -10,7 +10,7 @@ Radim Hošák <hosak(at)optics.upol.cz>
 
 from functools import reduce
 
-from pulsebox.config import calibration, pulsebox_pins
+from pulsebox.config import calibration, pulsebox_pins, pulsebox_pincount
 
 
 class DelayEvent():
@@ -30,8 +30,8 @@ class DelayEvent():
         __init__(self, duration)
 
     def __repr__(self):
-        return f"Pulsebox delay of {self.duration} s " \
-               f"({self.iters} loop iterations)"
+        return f"Delay: {self.duration} s " \
+               f"({self.iters} iters)"
 
 
 class StateChangeEvent():
@@ -41,10 +41,14 @@ class StateChangeEvent():
         self.odsr = odsr
 
     def __repr__(self):
-        msg = "Pulsebox state change: \n"
+        # msg = "Pulsebox state change: \n"
+        msg = "State change: "
         for channel, state in enumerate(self.channel_states):
-            msg += f"\tCH{channel}: {state}"
-        msg += f"\nREG_PIOC_ODSR value: {self.odsr}"
+            msg += f"{state}"
+            if channel % 4 == 3 and (channel + 1) < pulsebox_pincount:
+                msg +="."
+            # msg += f"\tCH{channel}: {state}"
+        msg += f" ({self.odsr})"
         return msg
 
 
@@ -59,7 +63,7 @@ class FlipEvent():
         self.timestamp = timestamp
 
     def __repr__(self):
-        return f"Pulsebox channel {self.channel} flip at {self.timestamp} s"
+        return f"Channel {self.channel} flip at {self.timestamp} s"
 
 def read_time(time_string):
     """Calculate time from a string containing a number and a time unit.

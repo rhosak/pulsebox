@@ -24,34 +24,74 @@ class FlipSequence():
 
 
 class Sequence():
-    def __init__(self, events = [], init_states = [0] * pulsebox_pincount):
+    def __init__(self, events = []):
         self.events = events
-        self.channel_states = init_states
         self.loop_counter = 0
         self.time = 0
 
-    def from_flip_sequence(self, fs, init_states = [0] * pulsebox_pincount):
-        fs.sort_flips()
-        
+    @classmethod
+    def from_flip_sequence(cls, fs):
+        events = []  # We will store the low-level events here
+        time = 0  # keep track of 'current' time as we go through the flips
+        loop_counter = 0
+        channel_states = [0] * pulsebox_pincount  # Every channels starts at 0.
+
+        if not fs.flips:
+            return cls(events, init_states)
+
         # This technique relies on using `pop()`, which eliminates the last
         # element of an array. So (1) we copy the array of flip events and
         # (2) we are going to reverse it, so `pop()` effectively eliminates
         # the first (smallest-timestamp) element.
-        flips = deepcopy(fs.flips)[::-1]
+        flips = deepcopy(fs.flips)
+        flips.sort(key=attrgetter("timestamp"), reverse=True)
 
-        events = []  # We will store the low-level events here
-        time = 0  # keep track of 'current' time as we go through the flips
-        
         # Go through all of the flips and create low level
         # `DelayEvent` and `StateChangeEvent` instances as needed.
-        while flips:
+        flip = flips.pop()
+        out_of_flips = False
+        while True:
             # Check the timestamp of the flip. Do we need a delay?
             required_delay = flip.timestamp - time
             required_iters = pev.time2iters(required_delay)
             if required_iters > 0:
                 events.append(pev.DelayEvent(iters=required_iters))
-            time += required_delay
-            
-            # How many channel flips are happenning at once?
-            
-        __init__(self, events, init_states)
+                loop_counter += 1
+            time += required_delay  # advance time
+
+            # Change the channel state for all channels where a flip
+            # is occuring right at this time.
+            # Also check that we are not going to flip the same channel
+            # more than once. Raise an error if that is the case.
+            flipped_channels = []
+            while flip.timestamp == time:
+                if flip.channel in flipped_channels:
+                    raise ValueError("Multiple flips of the same channel " \
+                                     "occuring at the same time are forbidden.")
+                channel_states[flip.channel] += 1
+                channel_states[flip.channel] %= 2
+                flipped_channels.append(flip.channel)
+                if flips:
+                    flip = flips.pop()
+                else:
+                    out_of_flips = True
+                    break
+            print(channel_states)
+            # Funny thing: If you create a StateChangeEvent with given
+            # channel_states and then change this variable later on, the
+            # event changes as well. Using deepcopy to prevent this.
+            events.append(pev.StateChangeEvent(deepcopy(channel_states)))
+
+            if out_of_flips:
+                break
+        
+        new_sequence = cls(events)
+        new_sequence.time = time
+        new_sequence.loop_counter = loop_counter
+
+        return new_sequence
+
+    def __repr__(self):
+        msg = f"Sequence - duration: {self.time} s, loops: {self.loop_counter}\n"
+        msg += str(self.events).strip("[]").replace(", ", "\n")
+        return msg
