@@ -155,3 +155,13 @@ def time2iters(time):
         raise ValueError("Negative time is not allowed.")
     iters = int(round(time / calibration))
     return iters
+
+
+def parse_events(event_string):
+    """Convert a long string of events into an array of event instances.
+    """
+    event_substrings = event_string.split(" ")
+    for substring in event_substrings:
+        event_type, event_params = substring[0], substring[1:]
+        if event_type.lower() == "p":
+            pass
