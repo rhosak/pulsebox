@@ -62,13 +62,28 @@ class StateChangeEvent():
         return msg
 
 
+class PulseEvent():
+    def __init__(self, channel, timestamp, duration):
+        self.channel = channel
+        self.timestamp = timestamp
+        self.duration = duration
+        self.flips = [FlipEvent(channel, timestamp=timestamp),
+                      FlipEvent(channel, timestamp=(timestamp+duration))]
+
+    def __repr__(self):
+        return f"Pulse on channel {self.channel} - " \
+               f"start: {self.timestamp} s, duration: {self.duration} s"
+
 class FlipEvent():
     """The fundamental channel flip event.
     User pulse sequence input is transformed into a sequence
     of pulsebox channel flips.
     """
-    def __init__(self, channel, time_string):
-        timestamp = read_time(time_string)
+    def __init__(self, channel, time_string=None, timestamp=None):
+        if not timestamp:
+            if not time_string:
+                raise ValueError("Neither time string nor timestamp given.")
+            timestamp = read_time(time_string)
         self.channel = channel
         self.timestamp = timestamp
 
@@ -157,11 +172,27 @@ def time2iters(time):
     return iters
 
 
-def parse_events(event_string):
+def parse_events(event_string, channel=None):
     """Convert a long string of events into an array of event instances.
     """
     event_substrings = event_string.split(" ")
+    events = []
     for substring in event_substrings:
-        event_type, event_params = substring[0], substring[1:]
-        if event_type.lower() == "p":
-            pass
+        try:
+            event_type, event_params = substring[0], substring[1:]
+        except (IndexError, ValueError):
+            print(f"CH {channel} - Invalid event string: " \
+                  f"{event_string.__repr__()}")
+            return events
+        if event_type.lower() == "p":  # PulseEvent
+            # Pulse event contains two timestrings - start and duration.
+            # Separate them.
+            timestamp, duration = None, None
+            for n, ch in enumerate(event_params):
+                if ch.isalpha():
+                    timestamp = read_time(event_params[:n+1])
+                    duration = read_time(event_params[n+1:])
+                    break
+            new_event = PulseEvent(channel, timestamp, duration)
+        events.append(new_event)
+    print(events)

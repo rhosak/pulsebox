@@ -12,8 +12,8 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-import events as pev
-import config as pcfg
+import pulsebox.events as pev
+import pulsebox.config as pcfg
 
 
 class ChannelEntry(Gtk.Entry):
@@ -64,7 +64,8 @@ def make_ino(widget, channel_toggles, channel_entries):
                        in zip(channel_toggles, channel_entries) \
                        if toggle.get_active() == True]
     for entry in enabled_entries:
-        pev.parse_events(entry)
+        entry_text = entry.get_text()
+        pev.parse_events(entry_text, entry.channel)
 
 window = MainWindow()
 window.connect("destroy", Gtk.main_quit)
