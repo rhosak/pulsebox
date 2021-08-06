@@ -12,8 +12,9 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-import pulsebox.events as pev
 import pulsebox.config as pcfg
+import pulsebox.events as pev
+import pulsebox.sequences as pseq
 
 
 class ChannelEntry(Gtk.Entry):
@@ -63,9 +64,17 @@ def make_ino(widget, channel_toggles, channel_entries):
     enabled_entries = [entry for toggle, entry \
                        in zip(channel_toggles, channel_entries) \
                        if toggle.get_active() == True]
+    flips = []
     for entry in enabled_entries:
         entry_text = entry.get_text()
-        pev.parse_events(entry_text, entry.channel)
+        new_flips = pev.parse_events(entry_text, entry.channel)
+        for flip in new_flips:
+            flips.append(flip)
+    print(flips)
+    fs = pseq.FlipSequence(flips)
+    seq = pseq.Sequence.from_flip_sequence(fs)
+    print(seq)
+    print(seq.code())
 
 window = MainWindow()
 window.connect("destroy", Gtk.main_quit)

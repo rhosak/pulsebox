@@ -193,6 +193,9 @@ def parse_events(event_string, channel=None):
                     timestamp = read_time(event_params[:n+1])
                     duration = read_time(event_params[n+1:])
                     break
-            new_event = PulseEvent(channel, timestamp, duration)
-        events.append(new_event)
+            pe = PulseEvent(channel, timestamp, duration)
+            new_events = pe.flips
+        for event in new_events:
+            events.append(event)
     print(events)
+    return events

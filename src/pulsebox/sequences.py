@@ -11,6 +11,7 @@ Radim Hošák <hosak(at)optics.upol.cz>
 from copy import deepcopy
 from operator import attrgetter
 
+import pulsebox.codeblocks as pcb
 import pulsebox.events as pev
 from pulsebox.config import pulsebox_pincount
 
@@ -24,20 +25,31 @@ class FlipSequence():
 
 
 class Sequence():
-    def __init__(self, events = []):
+    def __init__(self, events = [], triggered=False, parameter=1000):
         self.events = events
         self.loop_counter = 0
         self.time = 0
+        self.triggered = triggered
+        self.parameter = parameter
+
+    def code(self):
+        code = "\n".join([pcb.header(), pcb.setup(), ""])
+        if not self.events:
+            code += "   ;\n"
+        else:
+            code += "\n".join([event.codeblock for event in self.events] + [""])
+        code += pcb.end()
+        return code
 
     @classmethod
-    def from_flip_sequence(cls, fs):
+    def from_flip_sequence(cls, fs, triggered=False, parameter=1000):
         events = []  # We will store the low-level events here
         time = 0  # keep track of 'current' time as we go through the flips
         loop_counter = 0
         channel_states = [0] * pulsebox_pincount  # Every channels starts at 0.
 
         if not fs.flips:
-            return cls(events, init_states)
+            return cls(events)
 
         # This technique relies on using `pop()`, which eliminates the last
         # element of an array. So (1) we copy the array of flip events and
@@ -86,7 +98,7 @@ class Sequence():
             if out_of_flips:
                 break
         
-        new_sequence = cls(events)
+        new_sequence = cls(events, triggered=triggered, parameter=parameter)
         new_sequence.time = time
         new_sequence.loop_counter = loop_counter
 
