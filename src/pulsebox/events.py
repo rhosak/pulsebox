@@ -197,5 +197,4 @@ def parse_events(event_string, channel=None):
             new_events = pe.flips
         for event in new_events:
             events.append(event)
-    print(events)
     return events
