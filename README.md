@@ -1,6 +1,14 @@
 # pulsebox
 Arbitrary digital pulse sequence generator (_pulsebox_) with delay-loop timing, based on Arduino Due.
 
+## Run it
+
+bash```
+$ git pull https://github.com/rhosak/pulsebox.git
+$ cd pulsebox/src
+$ python -m pulsebox.gui
+```
+
 ![Example of a four-channel digital pulse sequence](docs/images/example_sequence.png)
 
 This repository accompanies the paper by R. Hošák and M. Ježek ([arXiv preprint](https://arxiv.org/abs/1801.02433), [published in Rev. Sci. Inst. 89, 045103 (2018)](https://doi.org/10.1063/1.5019685)). RH's [bachelor's thesis](docs/BachelorsThesisRH.pdf) contains additional information that goes more in-depth on both hardware and software.
