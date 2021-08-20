@@ -97,7 +97,7 @@ class Sequence():
 
             if out_of_flips:
                 break
-        
+
         new_sequence = cls(events, triggered=triggered, parameter=parameter)
         new_sequence.time = time
         new_sequence.loop_counter = loop_counter
@@ -106,8 +106,10 @@ class Sequence():
 
     def __repr__(self):
         msg = f"Sequence - duration: {self.time} s, loops: {self.loop_counter}\n"
-        msg += "\t* " + str(self.events[:10]).strip("[]").replace(", ",
-                                                                  "\n\t* ")
-        if len(self.events) > 10:
-            msg += "\n\t* ..."
+        # msg += "\t* " + str(self.events[:10]).strip("[]").replace(", ",
+                                                                    # "\n\t* ")
+        if self.time > 0:
+            msg += "\t* " + str(self.events).strip("[]").replace(", ", "\n\t* ")
+        # if len(self.events) > 10:
+        #     msg += "\n\t* ..."
         return msg
