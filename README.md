@@ -3,7 +3,7 @@ Arbitrary digital pulse sequence generator (_pulsebox_) with delay-loop timing, 
 
 ## Run it
 
-bash```
+```bash
 $ git pull https://github.com/rhosak/pulsebox.git
 $ cd pulsebox/src
 $ python -m pulsebox.gui
